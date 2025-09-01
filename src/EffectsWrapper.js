@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
@@ -121,6 +122,7 @@ const JsBackground = () => {
             mouse.x = event.x;
             mouse.y = event.y;
             
+            // Create particles on mouse move
             for (let i = 0; i < 3; i++) {
                 particlesArray.push(new Particle(
                     mouse.x + (Math.random() - 0.5) * 20,
@@ -135,10 +137,10 @@ const JsBackground = () => {
         window.addEventListener('mousemove', handleMouseMove);
 
         class Particle {
-    constructor(x, y, size, color, weight) {
-        this.x = x; this.y = y; this.size = size; this.color = color; this.weight = weight;
-        this.life = 1.0; this.decay = Math.random() * 0.02 + 0.005;
-    }
+            constructor(x, y, size, color, weight) {
+                this.x = x; this.y = y; this.size = size; this.color = color; this.weight = weight;
+                this.life = 1.0; this.decay = Math.random() * 0.02 + 0.005;
+            }
             draw() {
                 ctx.save();
                 ctx.globalAlpha = this.life;
@@ -146,20 +148,22 @@ const JsBackground = () => {
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
                 ctx.fillStyle = this.color;
                 ctx.fill();
+                
+                // Glow effect
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = this.color;
                 ctx.fill();
                 ctx.restore();
             }
             update() {
-        this.size *= 0.99;
-        this.life -= this.decay;
-        this.y += this.weight;
-        this.x += Math.sin(this.y * 0.01) * 0.5;
-        // The splice logic is removed from here
-    }
+                this.size *= 0.99;
+                this.life -= this.decay;
+                this.y += this.weight;
+                this.x += Math.sin(this.y * 0.01) * 0.5;
+            }
         }
-
+        
+        // Background code snippets
         const codeSnippets = [
             "const magic = () => {",
             "  return awesome();",
@@ -171,24 +175,29 @@ const JsBackground = () => {
         ];
 
         function animate() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // 
-    ctx.fillStyle = 'rgba(255, 193, 7, 0.1)';
-    ctx.font = '12px monospace';
-    codeSnippets.forEach((snippet, i) => {
-        ctx.fillText(snippet, 50, 100 + i * 25);
-        ctx.fillText(snippet, canvas.width - 200, 200 + i * 30);
-    });
-    
-    for (let i = particlesArray.length - 1; i >= 0; i--) {
-        // Update and draw the particle
-        particlesArray[i].update();
-        particlesArray[i].draw();
-    }
-            particlesArray = particlesArray.filter(particle => particle.life > 0 && particle.size > 0.1);        
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw code snippets
+            ctx.fillStyle = 'rgba(255, 193, 7, 0.1)';
+            ctx.font = '12px monospace';
+            codeSnippets.forEach((snippet, i) => {
+                ctx.fillText(snippet, 50, 100 + i * 25);
+                ctx.fillText(snippet, canvas.width - 200, 200 + i * 30);
+            });
+            
+            // Update, draw, and remove particles
+            for (let i = particlesArray.length - 1; i >= 0; i--) {
+                const particle = particlesArray[i];
+                particle.update();
+                particle.draw();
 
+                // If particle is dead, remove it from the array
+                if (particle.life <= 0 || particle.size <= 0.1) {
+                    particlesArray.splice(i, 1);
+                }
+            }
+            
             requestAnimationFrame(animate);
         }
 
@@ -203,11 +212,24 @@ const JsBackground = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-purple-900">
             <canvas ref={canvasRef} className="absolute inset-0" />
             
+            {/* JavaScript code demo panels */}
             <div className="absolute top-20 right-20 bg-yellow-500/10 p-4 rounded-lg backdrop-blur-sm border border-yellow-400/50">
                 <div className="text-yellow-200 font-mono text-xs">
-                    <div className="text-yellow-400">// Interactive Magic</div>
-                    <div>mouse.addEventListener(...) creates particles</div>
-                    <div>requestAnimationFrame(animate) loops animation</div>
+                    <div className="text-yellow-400">{'// Interactive Magic'}</div>
+                    <div>{`mouse.addEventListener('move', () => {`}</div>
+                    <div className="ml-2">{'createParticles();'}</div>
+                    <div className="ml-2">{'updateAnimation();'}</div>
+                    <div>{`});`}</div>
+                </div>
+            </div>
+            
+            <div className="absolute bottom-20 left-20 bg-green-500/10 p-4 rounded-lg backdrop-blur-sm border border-green-400/50">
+                <div className="text-green-200 font-mono text-xs">
+                    <div className="text-green-400">{'// Real-time Updates'}</div>
+                    <div>{`setInterval(() => {`}</div>
+                    <div className="ml-2">{'updateParticles();'}</div>
+                    <div className="ml-2">{'render();'}</div>
+                    <div>{`}, 16);`}</div>
                 </div>
             </div>
         </div>
@@ -371,21 +393,101 @@ const ThreeJsBackground = () => {
     );
 };
 
-export default function EffectsWrapper({ currentSection }) {
+// --- React Component Tree Background ---
+const ReactBackground = () => {
     return (
-        <div className="absolute inset-0 z-0">
-            <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 0 ? 'opacity-100' : 'opacity-0'}`}>
-                <HtmlBackground />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-cyan-900/20 to-blue-900">
+            {/* Component hierarchy visualization */}
+            <div className="absolute top-20 left-20 bg-cyan-500/10 p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50">
+                <div className="text-cyan-200 font-mono text-xs">
+                    <div className="text-cyan-400">{'// Component Tree'}</div>
+                    <div>{`function App() {`}</div>
+                    <div className="ml-2">{`return (`}</div>
+                    <div className="ml-4">{`<div>`}</div>
+                    <div className="ml-6">{`<Header />`}</div>
+                    <div className="ml-6">{`<ProfileInfo />`}</div>
+                    <div className="ml-6">{`<SkillsList />`}</div>
+                    <div className="ml-4">{`</div>`}</div>
+                    <div className="ml-2">{`);`}</div>
+                    <div>{`}`}</div>
+                </div>
             </div>
-            <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 1 ? 'opacity-100' : 'opacity-0'}`}>
-                <CssBackground />
+            
+            <div className="absolute bottom-20 right-20 bg-blue-500/10 p-4 rounded-lg backdrop-blur-sm border border-blue-400/50">
+                <div className="text-blue-200 font-mono text-xs">
+                    <div className="text-blue-400">{'// State Management'}</div>
+                    <div>{`const [state, setState] =`}</div>
+                    <div className="ml-2">{`useState(initialValue);`}</div>
+                    <div className="mt-2">{`useEffect(() => {`}</div>
+                    <div className="ml-2">{`// Side effects`}</div>
+                    <div>{`}, [dependency]);`}</div>
+                </div>
             </div>
-            <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 2 ? 'opacity-100' : 'opacity-0'}`}>
-                <JsBackground />
-            </div>
-            <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 3 ? 'opacity-100' : 'opacity-0'}`}>
-                <ThreeJsBackground />
+            
+            {/* Floating React atoms */}
+            {[...Array(6)].map((_, i) => (
+                <div
+                    key={i}
+                    className="absolute w-16 h-16 border-2 border-cyan-400/30 rounded-full flex items-center justify-center animate-spin"
+                    style={{
+                        left: `${20 + (i * 15)}%`,
+                        top: `${30 + (i % 2) * 40}%`,
+                        animationDuration: `${8 + i * 2}s`,
+                        animationDirection: i % 2 === 0 ? 'normal' : 'reverse'
+                    }}
+                >
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full" />
+                    <div className="absolute w-8 h-8 border border-cyan-400/50 rounded-full" />
+                </div>
+            ))}
+            
+            {/* Virtual DOM representation */}
+            <div className="absolute top-1/2 right-10 space-y-3 opacity-20">
+                <div className="flex items-center gap-2 text-cyan-300 text-xs">
+                    <div className="w-3 h-3 border border-cyan-400 rounded" />
+                    <span>Virtual DOM</span>
+                </div>
+                <div className="flex items-center gap-2 text-cyan-300 text-xs ml-4">
+                    <div className="w-3 h-3 border border-cyan-400 rounded" />
+                    <span>Component</span>
+                </div>
+                <div className="flex items-center gap-2 text-cyan-300 text-xs ml-8">
+                    <div className="w-3 h-3 border border-cyan-400 rounded" />
+                    <span>Props</span>
+                </div>
+                <div className="flex items-center gap-2 text-cyan-300 text-xs ml-8">
+                    <div className="w-3 h-3 border border-cyan-400 rounded" />
+                    <span>State</span>
+                </div>
             </div>
         </div>
     );
+};
+
+export default function EffectsWrapper({ currentSection, isMobile }) {
+  // On mobile, disable heavy effects for JS, React and Three.js
+  if (isMobile && currentSection >= 2) {
+    // Show a lighter background for mobile on heavy sections
+    return <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-purple-900" />;
+  }
+  
+  return (
+    <div className="absolute inset-0 z-0">
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 0 ? 'opacity-100' : 'opacity-0'}`}>
+            <HtmlBackground />
+        </div>
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 1 ? 'opacity-100' : 'opacity-0'}`}>
+            <CssBackground />
+        </div>
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 2 ? 'opacity-100' : 'opacity-0'}`}>
+            <JsBackground />
+        </div>
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 3 ? 'opacity-100' : 'opacity-0'}`}>
+            <ReactBackground />
+        </div>
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${currentSection === 4 ? 'opacity-100' : 'opacity-0'}`}>
+            <ThreeJsBackground />
+        </div>
+    </div>
+  );
 }
